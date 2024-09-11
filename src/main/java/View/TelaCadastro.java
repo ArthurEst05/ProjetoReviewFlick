@@ -1,13 +1,37 @@
-package com.example.servico;
+package View;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import entites.Usuario;
-import modelDao.DaoFactory;
-import modelDao.UsuarioDao;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import Controller.db.DB;
+import Controller.db.DbException;
+import Model.entites.Usuario;
+import Model.modelDao.DaoFactory;
+import Model.modelDao.UsuarioDao;
 
 public class TelaCadastro {
     private JFrame frame;
@@ -28,13 +52,18 @@ public class TelaCadastro {
     }
 
     private void initialize() {
+
         frame = new JFrame("Flick Review");
+
+        ImageIcon imgIcon = new ImageIcon("C:\\Users\\arthur\\Downloads\\ProjetoReviewFlick\\ProjetoReviewFlick\\imagePhantom.png");
+        frame.setIconImage(imgIcon.getImage());
+
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 
-        BackgroundPanel backgroundPanel = new BackgroundPanel("C:\\Users\\arthur\\Documents\\ProjetoFilmesPOO\\ProjetoFilmesPOO\\image\\telaCadastro.png");
+        BackgroundPanel backgroundPanel = new BackgroundPanel("C:\\Users\\arthur\\Downloads\\ProjetoReviewFlick\\ProjetoReviewFlick\\image\\telaCadastro.png");
         backgroundPanel.setLayout(new BorderLayout());
 
    
@@ -55,6 +84,7 @@ public class TelaCadastro {
         txtNome = new JTextField(15);
         txtNome.setFont(new Font("Arial", Font.PLAIN, 30));
         txtNome.setForeground(Color.BLACK);
+        txtNome.setBackground(Color.WHITE);
 
         JLabel lblEmail = new JLabel("Email:");
         lblEmail.setFont(new Font("Melted Monster", Font.PLAIN, 30));
@@ -62,6 +92,7 @@ public class TelaCadastro {
         txtEmail = new JTextField(15);
         txtEmail.setFont(new Font("Arial", Font.PLAIN, 30));
         txtEmail.setForeground(Color.BLACK);
+        txtEmail.setBackground(Color.WHITE); 
 
         JLabel lblSenha = new JLabel("Senha:");
         lblSenha.setFont(new Font("Melted Monster", Font.PLAIN, 30));
@@ -69,6 +100,7 @@ public class TelaCadastro {
         txtSenha = new JPasswordField(15);
         txtSenha.setFont(new Font("Arial", Font.PLAIN, 30));
         txtSenha.setForeground(Color.BLACK);
+        txtSenha.setBackground(Color.WHITE);  
 
         btnCadastrar = new JButton("Cadastrar");
         btnCadastrar.setIcon(new ImageIcon("path/to/register_icon.png"));
@@ -139,25 +171,66 @@ public class TelaCadastro {
     public void show() {
         frame.setVisible(true);
     }
+   private void cadastrarUsuario() {
+    try {
+      
+        String nome = txtNome.getText().trim();
+        String email = txtEmail.getText().trim();
+        String senha = new String(txtSenha.getPassword()).trim();
 
-    private void cadastrarUsuario() {
-        String nome = txtNome.getText();
-        String email = txtEmail.getText();
-        String senha = new String(txtSenha.getPassword());
+        if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Todos os campos devem ser preenchidos.", "Erro de Cadastro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com"))) {
+            JOptionPane.showMessageDialog(frame, "Por favor, use um email com os seguintes domínios: @gmail.com, @hotmail.com, ou @outlook.com.", "Erro de Cadastro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         UsuarioDao usuarioDao = DaoFactory.createUsuarioDao();
+
+        Usuario existente = findByEmail(email);
+        if (existente != null) {
+            JOptionPane.showMessageDialog(frame, "Email já registrado. Por favor, use outro email.", "Erro de Cadastro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         Usuario novoUsuario = new Usuario(null, nome, email, senha);
 
-        try {
-            usuarioDao.insert(novoUsuario);
-            JOptionPane.showMessageDialog(frame, "Usuário cadastrado com sucesso.", "Cadastro", JOptionPane.INFORMATION_MESSAGE);
-            frame.dispose(); 
-            
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erro ao cadastrar usuário.", "Cadastro", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
+        usuarioDao.insert(novoUsuario);
+        JOptionPane.showMessageDialog(frame, "Usuário cadastrado com sucesso.", "Cadastro", JOptionPane.INFORMATION_MESSAGE);
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(frame, "Erro ao cadastrar usuário: " + ex.getMessage(), "Cadastro", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
     }
+}
+
+public Usuario findByEmail(String email) {
+    Connection conn = DB.gConnection();
+    PreparedStatement st = null;
+    ResultSet rs = null;
+    try {
+        st = conn.prepareStatement("SELECT * FROM usuario WHERE Email = ?");
+        st.setString(1, email);
+
+        rs = st.executeQuery();
+        if (rs.next()) {
+            Usuario obj = new Usuario();
+            obj.setId(rs.getInt("Id"));
+            obj.setNome(rs.getString("Nome"));
+            obj.setEmail(rs.getString("Email"));
+            obj.setSenha(rs.getString("Senha"));
+            return obj;
+        }
+        return null;
+    } catch (SQLException e) {
+        throw new DbException(e.getMessage());
+    } finally {
+        DB.closeResultSet(rs);
+        DB.closeStatement(st);
+    }
+}
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {

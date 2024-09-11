@@ -1,4 +1,4 @@
-package entites;
+package Model.entites;
 
 public class Usuario {
     private Integer id;

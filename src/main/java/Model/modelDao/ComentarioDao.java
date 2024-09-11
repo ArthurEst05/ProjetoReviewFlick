@@ -1,8 +1,8 @@
-package modelDao;
+package Model.modelDao;
 
 import java.util.List;
 
-import entites.Comentario;
+import Model.entites.Comentario;
 
 public interface ComentarioDao {
     void save(Comentario obj);

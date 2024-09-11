@@ -1,4 +1,4 @@
-package com.example.servico;
+package View;
 
 import javax.swing.*;
 import java.awt.*;

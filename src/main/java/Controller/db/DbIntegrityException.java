@@ -1,4 +1,4 @@
-package db;
+package Controller.db;
 
 public class DbIntegrityException extends RuntimeException{
 

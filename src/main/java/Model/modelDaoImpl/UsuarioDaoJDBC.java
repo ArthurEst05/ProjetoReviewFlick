@@ -1,4 +1,4 @@
-package modelDaoImpl;
+package Model.modelDaoImpl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,10 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import db.DB;
-import db.DbException;
-import entites.Usuario;
-import modelDao.UsuarioDao;
+import Controller.db.DB;
+import Controller.db.DbException;
+import Model.entites.Usuario;
+import Model.modelDao.UsuarioDao;
 
 public class UsuarioDaoJDBC implements UsuarioDao{
 
@@ -20,6 +20,31 @@ public class UsuarioDaoJDBC implements UsuarioDao{
     public UsuarioDaoJDBC(Connection conn){
         this.conn = conn;
     }
+    public Usuario findByEmail(String email) {
+    PreparedStatement st = null;
+    ResultSet rs = null;
+    try {
+        st = conn.prepareStatement("SELECT * FROM usuario WHERE Email = ?");
+        st.setString(1, email);
+
+        rs = st.executeQuery();
+        if (rs.next()) {
+            Usuario obj = new Usuario();
+            obj.setId(rs.getInt("Id"));
+            obj.setNome(rs.getString("Nome"));
+            obj.setEmail(rs.getString("Email"));
+            obj.setSenha(rs.getString("Senha"));
+            return obj;
+        }
+        return null;
+    } catch (SQLException e) {
+        throw new DbException(e.getMessage());
+    } finally {
+        DB.closeResultSet(rs);
+        DB.closeStatement(st);
+    }
+}
+
 
     @Override
     public void insert(Usuario obj) {

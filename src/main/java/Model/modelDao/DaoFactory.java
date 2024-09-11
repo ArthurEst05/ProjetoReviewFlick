@@ -1,8 +1,8 @@
-package modelDao;
+package Model.modelDao;
 
-import db.DB;
-import modelDaoImpl.ComentarioDaoJDBC;
-import modelDaoImpl.UsuarioDaoJDBC;
+import Controller.db.DB;
+import Model.modelDaoImpl.ComentarioDaoJDBC;
+import Model.modelDaoImpl.UsuarioDaoJDBC;
 
 public class DaoFactory {
     public static UsuarioDao createUsuarioDao(){

@@ -1,4 +1,4 @@
-package modelDaoImpl;
+package Model.modelDaoImpl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,10 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import db.DbException;
-import entites.Comentario;
-import entites.Usuario;
-import modelDao.ComentarioDao;
+import Controller.db.DbException;
+import Model.entites.Comentario;
+import Model.entites.Usuario;
+import Model.modelDao.ComentarioDao;
 
 public class ComentarioDaoJDBC implements ComentarioDao {
     private Connection conn;
@@ -22,13 +22,13 @@ public class ComentarioDaoJDBC implements ComentarioDao {
 
     @Override
     public void save(Comentario obj) {
-        String sql = "INSERT INTO comentario (comentario, usuario_id, data, imdbID) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO comentario (comentario, usuario_id, data, imdbID, curtidas) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             st.setString(1, obj.getComentario());
             st.setInt(2, obj.getUsuario().getId());
             st.setDate(3, obj.getData());
-            st.setString(4, obj.getImdbID());  // Salvar o imdbID
-    
+            st.setString(4, obj.getImdbID());
+            st.setInt(5, obj.getCurtidas()); 
             int rowsAffected = st.executeUpdate();
     
             if (rowsAffected > 0) {
@@ -45,12 +45,13 @@ public class ComentarioDaoJDBC implements ComentarioDao {
 
     @Override
     public void update(Comentario obj) {
-        String sql = "UPDATE comentario SET comentario = ?, usuario_id = ?, data = ? WHERE id = ?";
+        String sql = "UPDATE comentario SET comentario = ?, usuario_id = ?, data = ?, curtidas = ? WHERE id = ?";
         try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setString(1, obj.getComentario());
             st.setInt(2, obj.getUsuario().getId());
             st.setDate(3, obj.getData());
-            st.setInt(4, obj.getId());
+            st.setInt(4, obj.getCurtidas()); 
+            st.setInt(5, obj.getId());
 
             st.executeUpdate();
         } catch (SQLException e) {
@@ -108,7 +109,7 @@ public class ComentarioDaoJDBC implements ComentarioDao {
         comentario.setId(rs.getInt("id"));
         comentario.setComentario(rs.getString("comentario"));
         comentario.setData(rs.getDate("data"));
-
+        comentario.setCurtidas(rs.getInt("curtidas")); 
         Usuario usuario = new Usuario();
         usuario.setId(rs.getInt("usuario_id"));
         usuario.setNome(rs.getString("usuario_nome"));
@@ -133,5 +134,39 @@ public class ComentarioDaoJDBC implements ComentarioDao {
             throw new DbException(e.getMessage());
         }
     }
-    
+
+    public boolean jaCurtiu(int usuarioId, int comentarioId) {
+        String sql = "SELECT * FROM curtidas WHERE usuario_id = ? AND comentario_id = ?";
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, usuarioId);
+            st.setInt(2, comentarioId);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+    }
+
+    public void registrarCurtida(int usuarioId, int comentarioId) {
+        String sql = "INSERT INTO curtidas (usuario_id, comentario_id) VALUES (?, ?)";
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, usuarioId);
+            st.setInt(2, comentarioId);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+    }
+
+    public void removerCurtida(int usuarioId, int comentarioId) {
+        String sql = "DELETE FROM curtidas WHERE usuario_id = ? AND comentario_id = ?";
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, usuarioId);
+            st.setInt(2, comentarioId);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+    }
 }

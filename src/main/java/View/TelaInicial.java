@@ -1,7 +1,8 @@
-package com.example.servico;
+package View;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -28,9 +29,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import entites.Usuario;
-import modelDao.DaoFactory;
-import modelDao.UsuarioDao;
+import Model.entites.Usuario;
+import Model.modelDao.DaoFactory;
+import Model.modelDao.UsuarioDao;
 
 public class TelaInicial {
     private Connection conn;
@@ -48,91 +49,102 @@ public class TelaInicial {
                  | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-        backgroundImage = new ImageIcon("C:\\Users\\arthur\\Documents\\ProjetoFilmesPOO\\ProjetoFilmesPOO\\image\\telainicial.png").getImage();
+        backgroundImage = new ImageIcon("C:\\Users\\arthur\\Downloads\\ProjetoReviewFlick\\ProjetoReviewFlick\\image\\telainicial.png").getImage();
         initialize();
     }
 
     private void initialize() {
         frame = new JFrame("Flick Review");
+    
+        ImageIcon imgIcon = new ImageIcon("C:\\Users\\arthur\\Downloads\\ProjetoReviewFlick\\ProjetoReviewFlick\\image\\Phantom.png");
+        frame.setIconImage(imgIcon.getImage());
+    
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-
         frame.getContentPane().setLayout(new BorderLayout());
-
-        
+    
         JPanel loginPanel = new BackgroundPanel();
         loginPanel.setLayout(new GridBagLayout());
         loginPanel.setBorder(BorderFactory.createEmptyBorder(20, 60, 20, 60));
-
+    
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
-
+    
         JLabel lblUsername = new JLabel("Nome de usuário:");
         lblUsername.setFont(new Font("Melted Monster", Font.PLAIN, 30));
-        lblUsername.setForeground(Color.red); 
+        lblUsername.setForeground(Color.RED);
+    
         txtUsername = new JTextField(25); 
-
+        txtUsername.setForeground(Color.BLACK);
+        txtUsername.setBackground(Color.WHITE);
+        txtUsername.setFont(new Font("Arial", Font.PLAIN, 24)); // Aumentando a fonte
+        txtUsername.setPreferredSize(new Dimension(txtUsername.getPreferredSize().width, 40)); // Aumentando a altura
+    
         JLabel lblPassword = new JLabel("Senha:");
         lblPassword.setFont(new Font("Melted Monster", Font.PLAIN, 30));
-        lblPassword.setForeground(Color.red); 
+        lblPassword.setForeground(Color.RED);
+    
         txtPassword = new JPasswordField(25); 
-
+        txtPassword.setForeground(Color.BLACK);
+        txtPassword.setBackground(Color.WHITE);
+        txtPassword.setFont(new Font("Arial", Font.PLAIN, 24)); // Aumentando a fonte
+        txtPassword.setPreferredSize(new Dimension(txtPassword.getPreferredSize().width, 40)); // Aumentando a altura
+    
         btnCadastrar = new JButton("Cadastrar");
         btnEntrar = new JButton("Entrar");
-
+    
         btnCadastrar.setIcon(new ImageIcon("path/to/register_icon.png"));
         btnEntrar.setIcon(new ImageIcon("path/to/login_icon.png"));
-
+    
         btnCadastrar.setBackground(new Color(0, 0, 0));
-        btnCadastrar.setForeground(new Color(255,63,63));
+        btnCadastrar.setForeground(new Color(255, 63, 63));
         btnCadastrar.setFont(new Font("Melted Monster", Font.BOLD, 30));
         btnCadastrar.setFocusPainted(false);
         btnCadastrar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
+    
         btnEntrar.setBackground(new Color(255, 63, 63));
-        btnEntrar.setForeground(new Color(0,0,0));
+        btnEntrar.setForeground(new Color(0, 0, 0));
         btnEntrar.setFont(new Font("Melted Monster", Font.BOLD, 30));
         btnEntrar.setFocusPainted(false);
         btnEntrar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
+    
         gbc.gridx = 0;
         gbc.gridy = 0;
         loginPanel.add(lblUsername, gbc);
-
+    
         gbc.gridx = 1;
         gbc.gridy = 0;
         loginPanel.add(txtUsername, gbc);
-
+    
         gbc.gridx = 0;
         gbc.gridy = 1;
         loginPanel.add(lblPassword, gbc);
-
+    
         gbc.gridx = 1;
         gbc.gridy = 1;
         loginPanel.add(txtPassword, gbc);
-
+    
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         loginPanel.add(btnEntrar, gbc);
-
+    
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         loginPanel.add(btnCadastrar, gbc);
-
+    
         frame.getContentPane().add(loginPanel, BorderLayout.CENTER);
-
+    
         btnEntrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 entrar();
             }
         });
-
+    
         btnCadastrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

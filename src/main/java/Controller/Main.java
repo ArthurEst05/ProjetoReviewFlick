@@ -1,6 +1,9 @@
-package com.example.servico;
+package Controller;
+
 
 import java.awt.EventQueue;
+
+import View.TelaInicial;
 
 public class Main {
 

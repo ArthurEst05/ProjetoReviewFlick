@@ -1,8 +1,8 @@
-package modelDao;
+package Model.modelDao;
 
 import java.util.List;
 
-import entites.Usuario;
+import Model.entites.Usuario;
 
 public interface UsuarioDao {
     void insert(Usuario obj);

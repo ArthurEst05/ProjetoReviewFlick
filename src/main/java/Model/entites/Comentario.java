@@ -1,4 +1,4 @@
-package entites;
+package Model.entites;
 
 import java.sql.Date;
 
@@ -9,6 +9,7 @@ public class Comentario {
     private Usuario usuario;
     private Date data;
     private String imdbID;
+    private int curtidas;
 
     public Comentario(String comentario, Usuario usuario, Date data, String imdbID) {
         this.comentario = comentario;
@@ -20,8 +21,12 @@ public class Comentario {
     
     public Comentario() {
     }
-
-
+    public int getCurtidas() {
+        return curtidas;
+    }
+    public void setCurtidas(int curtidas) {
+        this.curtidas = curtidas;
+    }
     public String getComentario() {
         return comentario;
     }
@@ -51,5 +56,9 @@ public class Comentario {
     }
     public void setImdbID(String imdbID) {
         this.imdbID = imdbID;
+    }
+    @Override
+    public String toString() {
+        return usuario.getNome() + " (" + data + "): " + comentario;
     }
 }
